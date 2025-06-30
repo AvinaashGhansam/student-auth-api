@@ -17,6 +17,9 @@ importers:
       express-async-handler:
         specifier: ^1.2.0
         version: 1.2.0
+      express-list-endpoints:
+        specifier: ^7.1.1
+        version: 7.1.1
       express-winston:
         specifier: ^4.2.0
         version: 4.2.0(winston@3.17.0)
@@ -308,6 +311,10 @@ packages:
 
   express-async-handler@1.2.0:
     resolution: {integrity: sha512-rCSVtPXRmQSW8rmik/AIb2P0op6l7r1fMW538yyvTMltCO4xQEWMmobfrIxN2V1/mVrgxB8Az3reYF6yUZw37w==}
+
+  express-list-endpoints@7.1.1:
+    resolution: {integrity: sha512-SA6YHH1r6DrioJ4fFJNqiwu1FweGFqJZO9KBApMzwPosoSGPOX2AW0wiMepOXjojjEXDuP9whIvckomheErbJA==}
+    engines: {node: '>=18'}
 
   express-winston@4.2.0:
     resolution: {integrity: sha512-EMD74g63nVHi7pFleQw7KHCxiA1pjF5uCwbCfzGqmFxs9KvlDPIVS3cMGpULm6MshExMT9TjC3SqmRGB9kb7yw==}
@@ -1014,6 +1021,8 @@ snapshots:
   etag@1.8.1: {}
 
   express-async-handler@1.2.0: {}
+
+  express-list-endpoints@7.1.1: {}
 
   express-winston@4.2.0(winston@3.17.0):
     dependencies:
