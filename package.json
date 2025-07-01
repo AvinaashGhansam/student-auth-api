@@ -1,6 +1,7 @@
 {
   "name": "app-template-ts",
   "version": "1.0.0",
+  "packageManager": "pnpm@10.12.4",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -11,7 +12,8 @@
     "docker:build": "docker build -t app-template-ts",
     "docker:run": "docker run -p 3000:3000 app-template-ts",
     "migrate": "ts-node src/scripts/migrate.ts",
-    "seed": "ts-node src/scripts/seed.ts"
+    "seed": "ts-node src/scripts/seed.ts",
+    "preinstall": "node -e \"if (!process.env.npm_execpath?.includes('pnpm')) { console.error('✖ Please use pnpm to install dependencies.'); process.exit(1) }\""
   },
   "keywords": [],
   "author": "",
@@ -23,15 +25,20 @@
     "express-async-handler": "^1.2.0",
     "express-list-endpoints": "^7.1.1",
     "express-winston": "^4.2.0",
+    "js-yaml": "^4.1.0",
     "mongodb": "6.17",
     "mongoose": "^8.16.1",
+    "swagger-ui-express": "^5.0.1",
     "uuid": "^11.1.0",
     "winston": "^3.17.0"
   },
   "devDependencies": {
     "@types/express": "^5.0.3",
+    "@types/js-yaml": "^4.0.9",
     "@types/mongoose": "^5.11.96",
     "@types/node": "^24.0.3",
+    "@types/swagger-jsdoc": "^6.0.4",
+    "@types/swagger-ui-express": "^4.1.8",
     "nodemon": "^3.1.10",
     "prettier": "3.6.2",
     "ts-node": "^10.9.2",

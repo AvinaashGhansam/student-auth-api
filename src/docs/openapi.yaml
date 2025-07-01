@@ -1,0 +1,117 @@
+openapi: 3.0.0
+info:
+  title: Student Auth API
+  version: 1.0.0
+  description: API for managing student authentication and sheets.
+servers:
+  - url: http://localhost:3000/api/v1
+    description: Local dev server
+
+paths:
+  /sheets:
+    get:
+      summary: Retrieve all sheets
+      tags:
+        - Sheets
+      responses:
+        '200':
+          description: A JSON array of Attendance Sheet(s) objects
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Sheet'
+      parameters:
+        - name: professorId
+          in: query
+          description: Only return sheets for this professor
+          required: false
+          schema:
+            type: string
+        - name: sheetId
+          in: query
+          description: Only return sheets with this sheet identifier
+          required: false
+          schema:
+            type: string
+
+
+    post:
+      summary: Create an attendance sheet
+      tags:
+        - Sheets
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Sheet'
+      responses:
+        '201':
+          description: Attendance sheet creation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Sheet'
+
+components:
+  schemas:
+    Sheet:
+      type: object
+      required:
+        - professorId
+        - professorFirstName
+        - professorLastName
+        - sheetId
+        - className
+        - dateCreated
+        - secretKey
+        - isActive
+      properties:
+        professorId:
+          type: string
+          description: Mongo-generated identifier
+        professorFirstName:
+          type: string
+          description: First name of the professor
+        professorLastName:
+          type: string
+          description: Last Name of the professor
+        sheetId:
+          type: string
+          description: The sign in sheet identifier
+        className:
+          type: string
+          description: The name of the class
+        dateCreated:
+          type: string
+          format: date-time
+          description: Creation timestamp
+        secretKey:
+          type: object
+          required:
+            - secret
+          properties:
+            secret:
+              type: string
+              description: Your secret string
+            location:
+              type: object
+              properties:
+                lat:
+                  type: number
+                  description: Latitude coordinate
+                lon:
+                  type: number
+                  description: Longitude coordinate
+        isActive:
+          type: boolean
+
+
+
+
+
+

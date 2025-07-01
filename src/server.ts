@@ -7,11 +7,29 @@ import { config } from "./config/config";
 import { logger } from "./utils/logger";
 import sheetsRouter from "./routes/v1/sheet.route";
 import { errorHandler } from "./middleware/ErrorHandler";
+import swaggerUi from "swagger-ui-express";
+import fs from "fs";
+import path from "path";
+import yaml from "js-yaml";
 
 const app: Application = express();
 const server = http.createServer(app);
 
 app.use(express.json());
+
+// serve JSON or YAML spec
+const specPath = path.resolve(__dirname, "./docs/openapi.yaml");
+const openapiDocument = yaml.load(fs.readFileSync(specPath, "utf8")) as Record<
+  string,
+  unknown
+>;
+
+app.use(
+  "/docs",
+  swaggerUi.serve,
+  swaggerUi.setup(openapiDocument, { explorer: true }),
+);
+
 app.use(
   expressWinston.logger({
     winstonInstance: logger,
@@ -24,33 +42,25 @@ app.use(
 mongoose
   .connect(config.dbUri ?? "")
   .then(() => {
-    console.log("MongoDB connected");
+    logger.info("MongoDB connected");
     const mountPath = `${config.apiPrefix}/${config.apiVersion}/sheets`;
     app.use(mountPath, sheetsRouter);
 
-    console.log("🛣️  Registered routes:");
-    console.table(
-      listEndpoints(app).map((ep) => ({
-        path: ep.path,
-        methods: ep.methods.join(", "),
-      })),
-    );
-
     server.listen(config.port, () => {
-      console.log(`Server running on port ${config.port}`);
+      logger.info(`Server running on port ${config.port}`);
     });
   })
   .catch((err) => {
-    console.error("Mongo connection error:", err);
+    logger.error("Mongo connection error:", err);
     process.exit(1);
   });
 
 // Graceful shutdown
 const shutdown = () => {
-  console.log("SIGTERM received, closing server...");
+  logger.info("SIGTERM received, closing server...");
   server.close(() => {
     mongoose.disconnect().then(() => {
-      console.log("Mongo disconnected, exiting.");
+      logger.warning("Mongo disconnected, exiting.");
       process.exit(0);
     });
   });

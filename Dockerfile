@@ -1,35 +1,36 @@
-# Stage 1: Build
+# Stage 1: Builder
 FROM node:20-alpine AS builder
-
-# Set working directory
 WORKDIR /app
 
-# Install dependencies
-COPY package.json package-lock.json ./
-RUN npm ci
+# 1) Enable corepack & activate pnpm
+RUN corepack enable \
+  && corepack prepare pnpm@latest --activate
 
-# Copy source files
+# 2) Copy only the pnpm lockfile and manifest, then install deps
+COPY package.json pnpm-lock.yaml ./
+RUN pnpm install --frozen-lockfile
+
+# 3) Copy your source and build
 COPY tsconfig.json ./
 COPY src ./src
+RUN pnpm run build
 
-# Build TypeScript
-RUN npm run build
+
 
 # Stage 2: Runtime
 FROM node:20-alpine
-
 WORKDIR /app
 
-# Install only production dependencies
-COPY package.json package-lock.json ./
-RUN npm ci --only=production
+# 1) Enable corepack & pnpm again
+RUN corepack enable \
+  && corepack prepare pnpm@latest --activate
 
-# Copy compiled output from builder
+# 2) Copy lockfile & manifest, install only prod deps
+COPY package.json pnpm-lock.yaml ./
+RUN pnpm install --frozen-lockfile --prod
+
+# 3) Bring in your compiled code
 COPY --from=builder /app/dist ./dist
 
-# Expose port
 EXPOSE 3000
-
-# Start the app
 CMD ["node", "dist/server.js"]
-
