@@ -17,12 +17,13 @@ router
   .get(asyncHandler(ctrl.getSheetById.bind(ctrl)))
   .put(asyncHandler(ctrl.updateSheet.bind(ctrl)));
 
-logger.info("Registered routes:", { router });
+logger.info("Registered Sheet Routes:", { router });
 console.table(
   listEndpoints(router).map((ep) => ({
     path: ep.path,
     methods: ep.methods.join(", "),
   })),
 );
+logger.info("Swagger Route: http://localhost:3000/docs/#/");
 
 export default router;

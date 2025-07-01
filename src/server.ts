@@ -2,7 +2,6 @@ import express, { Application } from "express";
 import http from "http";
 import mongoose from "mongoose";
 import expressWinston from "express-winston";
-import listEndpoints from "express-list-endpoints";
 import { config } from "./config/config";
 import { logger } from "./utils/logger";
 import sheetsRouter from "./routes/v1/sheet.route";

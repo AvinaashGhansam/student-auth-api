@@ -13,15 +13,6 @@ paths:
       summary: Retrieve all sheets
       tags:
         - Sheets
-      responses:
-        '200':
-          description: A JSON array of Attendance Sheet(s) objects
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Sheet'
       parameters:
         - name: professorId
           in: query
@@ -35,7 +26,15 @@ paths:
           required: false
           schema:
             type: string
-
+      responses:
+        '200':
+          description: A JSON array of Attendance Sheet(s) objects
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Sheet'
 
     post:
       summary: Create an attendance sheet
@@ -49,13 +48,49 @@ paths:
               $ref: '#/components/schemas/Sheet'
       responses:
         '201':
-          description: Attendance sheet creation
+          description: Attendance sheet created
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Sheet'
+                $ref: '#/components/schemas/Sheet'
+
+  /sheets/{id}:
+    put:
+      summary: Update an attendance sheet by ID
+      tags:
+        - Sheets
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the sheet to update
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SheetUpdate'
+      responses:
+        '200':
+          description: Updated attendance sheet object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Sheet'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Sheet not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 
 components:
   schemas:
@@ -79,10 +114,10 @@ components:
           description: First name of the professor
         professorLastName:
           type: string
-          description: Last Name of the professor
+          description: Last name of the professor
         sheetId:
           type: string
-          description: The sign in sheet identifier
+          description: The sign-in sheet identifier
         className:
           type: string
           description: The name of the class
@@ -110,8 +145,42 @@ components:
         isActive:
           type: boolean
 
+    SheetUpdate:
+      type: object
+      description: Fields to update on an existing sheet (all optional)
+      properties:
+        professorId:
+          type: string
+        professorFirstName:
+          type: string
+        professorLastName:
+          type: string
+        sheetId:
+          type: string
+        className:
+          type: string
+        dateCreated:
+          type: string
+          format: date-time
+        secretKey:
+          type: object
+          properties:
+            secret:
+              type: string
+            location:
+              type: object
+              properties:
+                lat:
+                  type: number
+                lon:
+                  type: number
+        isActive:
+          type: boolean
 
-
-
-
-
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error

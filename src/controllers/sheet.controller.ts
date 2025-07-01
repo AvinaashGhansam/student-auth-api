@@ -2,6 +2,9 @@ import { Request, Response, NextFunction } from "express";
 import { SheetService } from "../services/sheet.service";
 import { ApiError } from "../utils/ApiError";
 
+/**
+ * This sheet controller will be used to handle request and response from the server
+ */
 export class SheetController {
   private readonly sheetService = new SheetService();
 
@@ -19,10 +22,17 @@ export class SheetController {
         sheetId?: string;
       };
 
-      // Build filter dynamically
-      const filter: Partial<Record<"professorId" | "sheetId", string>> = {};
-      if (professorId) filter.professorId = professorId;
-      if (sheetId) filter.sheetId = sheetId;
+      let filter: any = {};
+      if (professorId && sheetId) {
+        // either professorId OR sheetId
+        filter = {
+          $or: [{ professorId }, { sheetId }],
+        };
+      } else if (professorId) {
+        filter = { professorId };
+      } else if (sheetId) {
+        filter = { sheetId };
+      }
 
       const sheets = await this.sheetService.getSheets(filter);
       res.json(sheets);
