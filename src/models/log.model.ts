@@ -1,29 +1,33 @@
-import mongoose, { Model } from "mongoose";
-import { Logs } from "../types";
+import mongoose, { Schema, Document } from "mongoose";
 
-const LogSchema = new mongoose.Schema({
-  id: {
-    type: String,
-    required: true,
+export interface ILog extends Document {
+  sheetId: string;
+  id: string;
+  name?: string;
+  studentId?: string;
+  signedInAt?: string;
+  className?: string;
+  location?: {
+    lat: number;
+    lng: number;
+  };
+  locationDenied?: boolean;
+  fingerprint?: string;
+}
+
+const LogSchema = new Schema<ILog>({
+  sheetId: { type: String, required: true },
+  id: { type: String, required: true },
+  name: { type: String },
+  studentId: { type: String },
+  signedInAt: { type: String },
+  className: { type: String },
+  location: {
+    lat: { type: Number },
+    lng: { type: Number },
   },
-  sheetId: {
-    type: Number,
-    required: true,
-  },
-  firstName: {
-    type: String,
-    required: true,
-  },
-  lastName: { type: String, required: true },
-  email: { type: String, required: true },
-  name: { type: String, required: true },
-  class: { type: String, required: true },
-  secretKey: {
-    secret: { type: String, required: true },
-    location: {
-      lat: { type: Number, required: false },
-      lon: { type: Number, required: false },
-    },
-  },
+  locationDenied: { type: Boolean },
+  fingerprint: { type: String },
 });
-export const LogModel: Model<Logs> = mongoose.model<Logs>("Logs", LogSchema);
+
+export default mongoose.model<ILog>("Log", LogSchema);

@@ -1,58 +1,24 @@
 import { Request, Response, NextFunction } from "express";
 import { SheetService } from "../services/sheet.service";
-import { ApiError } from "../utils/ApiError";
 
-/**
- * This sheet controller will be used to handle request and response from the server
- */
 export class SheetController {
-  private readonly sheetService = new SheetService();
+  private service = new SheetService();
 
-  /**
-   * GET /sheets?professorId=…&sheetId=…
-   */
-  public async getSheets(
-    req: Request,
-    res: Response,
-    next: NextFunction,
-  ): Promise<void> {
+  async getSheets(req: Request, res: Response, next: NextFunction) {
     try {
-      const { professorId, sheetId } = req.query as {
-        professorId?: string;
-        sheetId?: string;
-      };
-
-      let filter: any = {};
-      if (professorId && sheetId) {
-        // either professorId OR sheetId
-        filter = {
-          $or: [{ professorId }, { sheetId }],
-        };
-      } else if (professorId) {
-        filter = { professorId };
-      } else if (sheetId) {
-        filter = { sheetId };
-      }
-
-      const sheets = await this.sheetService.getSheets(filter);
+      const sheets = await this.service.getSheets();
       res.json(sheets);
     } catch (err) {
       next(err);
     }
   }
 
-  /**
-   * GET /sheets/:id
-   */
-  public async getSheetById(
-    req: Request,
-    res: Response,
-    next: NextFunction,
-  ): Promise<void> {
+  async getSheetById(req: Request, res: Response, next: NextFunction) {
     try {
-      const sheet = await this.sheetService.getSheetById(req.params.id);
+      const sheet = await this.service.getSheetById(req.params._id);
       if (!sheet) {
-        return next(new ApiError(404, "Sheet not found"));
+        res.status(404).json({ error: "Not found" });
+        return;
       }
       res.json(sheet);
     } catch (err) {
@@ -60,42 +26,32 @@ export class SheetController {
     }
   }
 
-  /**
-   * POST /sheets
-   */
-  public async createSheet(
-    req: Request,
-    res: Response,
-    next: NextFunction,
-  ): Promise<void> {
+  async createSheet(req: Request, res: Response, next: NextFunction) {
     try {
-      const newSheet = await this.sheetService.createSheet(req.body);
-      res.status(201).json(newSheet);
-    } catch (err: any) {
-      if (err.name === "ValidationError") {
-        res.status(400).json({ message: err.message, details: err.errors });
-      }
+      const sheet = await this.service.createSheet(req.body);
+      res.status(201).json(sheet);
+    } catch (err) {
       next(err);
     }
   }
 
-  /**
-   * PUT /sheets/:id
-   */
-  public async updateSheet(
-    req: Request,
-    res: Response,
-    next: NextFunction,
-  ): Promise<void> {
+  async updateSheet(req: Request, res: Response, next: NextFunction) {
     try {
-      const updated = await this.sheetService.updateSheet(
-        req.params.id,
-        req.body,
-      );
-      if (!updated) {
-        return next(new ApiError(404, "Sheet not found"));
+      const sheet = await this.service.updateSheet(req.params._id, req.body);
+      if (!sheet) {
+        res.status(404).json({ error: "Not found" });
+        return;
       }
-      res.json(updated);
+      res.json(sheet);
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async deleteSheet(req: Request, res: Response, next: NextFunction) {
+    try {
+      await this.service.deleteSheet(req.params._id);
+      res.status(204).end();
     } catch (err) {
       next(err);
     }

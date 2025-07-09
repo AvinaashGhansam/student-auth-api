@@ -1,23 +1,31 @@
-import mongoose, { Schema, Document, Model } from "mongoose";
-import { Sheet } from "../types";
+import mongoose, { Schema, Document } from "mongoose";
 
-const SheetSchema = new Schema<Sheet>({
-  professorId: { type: String, required: true },
-  professorFirstName: { type: String, required: true },
-  professorLastName: { type: String, required: true },
-  sheetId: { type: String, required: true },
+export interface ISheet extends Document {
+  className: string;
+  dateCreated: string;
+  secretKey?: string;
+  isActive: boolean;
+  location: {
+    lat: string;
+    lng: string;
+  };
+  maxRadius?: string;
+  createdBy?: string;
+  reportId?: string;
+}
+
+const SheetSchema = new Schema<ISheet>({
   className: { type: String, required: true },
-  dateCreated: { type: Date, default: Date.now },
-  secretKey: {
-    secret: { type: String, required: true },
-    location: {
-      lat: { type: Number, required: false },
-      lon: { type: Number, required: false },
-    },
-  },
+  dateCreated: { type: String, required: true },
+  secretKey: { type: String },
   isActive: { type: Boolean, default: false },
+  location: {
+    lat: { type: String },
+    lng: { type: String },
+  },
+  maxRadius: { type: String },
+  createdBy: { type: String },
+  reportId: { type: String },
 });
-export const SheetModel: Model<Sheet> = mongoose.model<Sheet>(
-  "Sheet",
-  SheetSchema,
-);
+
+export default mongoose.model<ISheet>("Sheet", SheetSchema);

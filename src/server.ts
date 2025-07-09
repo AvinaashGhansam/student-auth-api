@@ -1,79 +1,39 @@
-import express, { Application } from "express";
-import http from "http";
+import express from "express";
 import mongoose from "mongoose";
-import expressWinston from "express-winston";
-import { config } from "./config/config";
-import { logger } from "./utils/logger";
-import sheetsRouter from "./routes/v1/sheet.route";
-import { errorHandler } from "./middleware/ErrorHandler";
+import cors from "cors";
+import dotenv from "dotenv";
 import swaggerUi from "swagger-ui-express";
-import fs from "fs";
-import path from "path";
-import yaml from "js-yaml";
+import YAML from "yamljs";
 
-const app: Application = express();
-const server = http.createServer(app);
+import sheetsRouter from "./routes/api/v1/sheet.route";
+import logsRouter from "./routes/api/v1/log.route";
 
+dotenv.config();
+
+const app = express();
+app.use(cors());
 app.use(express.json());
 
-// serve JSON or YAML spec
-const specPath = path.resolve(__dirname, "./docs/openapi.yaml");
-const openapiDocument = yaml.load(fs.readFileSync(specPath, "utf8")) as Record<
-  string,
-  unknown
->;
+// serve flat endpoints
+app.use("/api/v1/sheets", sheetsRouter);
+app.use("/api/v1/logs", logsRouter);
 
-app.use(
-  "/docs",
-  swaggerUi.serve,
-  swaggerUi.setup(openapiDocument, { explorer: true }),
-);
+const swaggerDocument = YAML.load("./src/docs/openapi.yaml");
+app.use("/api/v1/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-app.use(
-  expressWinston.logger({
-    winstonInstance: logger,
-    meta: true,
-    msg: "{{req.method}} {{req.url}} {{res.statusCode}} {{res.responseTime}}ms",
-  }),
-);
-
-// Connect to MongoDB, then start
+const PORT = process.env.PORT || 4000;
 mongoose
-  .connect(config.dbUri ?? "")
+  .connect(process.env.MONGODB_URI!)
   .then(() => {
-    logger.info("MongoDB connected");
-    const mountPath = `${config.apiPrefix}/${config.apiVersion}/sheets`;
-    app.use(mountPath, sheetsRouter);
-
-    server.listen(config.port, () => {
-      logger.info(`Server running on port ${config.port}`);
+    app.listen(PORT, () => {
+      console.log("\n==============================");
+      console.log(`🚀 Server running on port ${PORT}`);
+      console.log("\nAvailable routes:");
+      console.log(`  • Sheets: http://localhost:${PORT}/api/v1/sheets`);
+      console.log(`  • Logs:   http://localhost:${PORT}/api/v1/logs`);
+      console.log("\nSwagger docs:");
+      console.log(`  • http://localhost:${PORT}/api/v1/docs`);
+      console.log("==============================\n");
     });
   })
-  .catch((err) => {
-    logger.error("Mongo connection error:", err);
-    process.exit(1);
-  });
-
-// Graceful shutdown
-const shutdown = () => {
-  logger.info("SIGTERM received, closing server...");
-  server.close(() => {
-    mongoose.disconnect().then(() => {
-      logger.warning("Mongo disconnected, exiting.");
-      process.exit(0);
-    });
-  });
-};
-
-process.on("SIGTERM", shutdown);
-process.on("SIGINT", shutdown);
-
-// Error handling (after all routes)
-app.use(
-  (
-    err: any,
-    req: express.Request,
-    res: express.Response,
-    next: express.NextFunction,
-  ) => errorHandler.handle(err, req, res, next),
-);
+  .catch((err) => console.error("MongoDB connection error:", err));

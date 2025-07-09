@@ -27,14 +27,14 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: A JSON array of Attendance Sheet(s) objects
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Sheet'
+                  $ref: "#/components/schemas/Sheet"
 
     post:
       summary: Create an attendance sheet
@@ -45,14 +45,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Sheet'
+              $ref: "#/components/schemas/Sheet"
       responses:
-        '201':
+        "201":
           description: Attendance sheet created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Sheet'
+                $ref: "#/components/schemas/Sheet"
 
   /sheets/{id}:
     put:
@@ -71,26 +71,26 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SheetUpdate'
+              $ref: "#/components/schemas/SheetUpdate"
       responses:
-        '200':
+        "200":
           description: Updated attendance sheet object
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Sheet'
-        '400':
+                $ref: "#/components/schemas/Sheet"
+        "400":
           description: Validation error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-        '404':
+                $ref: "#/components/schemas/Error"
+        "404":
           description: Sheet not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
 
 components:
   schemas:
