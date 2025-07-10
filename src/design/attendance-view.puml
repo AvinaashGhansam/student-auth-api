@@ -10,7 +10,7 @@ skinparam sequence {
     ParticipantBackgroundColor #BBDEFB
 }
 
-title Sequence 4: Professor Views Attendance Logs
+title Professor Views Attendance Logs
 
 actor Professor
 participant "Express\nServer" as Express

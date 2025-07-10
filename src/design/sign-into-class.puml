@@ -10,7 +10,7 @@ skinparam sequence {
     ParticipantBackgroundColor #BBDEFB
 }
 
-title Sequence 2: Student Signs Into Class
+title Student Signs Into Class
 
 actor Student
 participant "Express\nServer" as Express

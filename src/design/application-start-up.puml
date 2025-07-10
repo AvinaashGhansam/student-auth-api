@@ -10,7 +10,7 @@ skinparam sequence {
     ParticipantBackgroundColor #BBDEFB
 }
 
-title Sequence 5: Application Startup Process
+title Application Startup Process
 
 participant "Docker\nCompose" as Docker
 participant "MongoDB\nContainer" as MongoContainer

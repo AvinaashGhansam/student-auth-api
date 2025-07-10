@@ -20,8 +20,7 @@ skinparam stereotype {
     IBackgroundColor #9FA8DA
 }
 
-title Student Auth API - Class Diagram with Packages
-
+title Student Auth API
 ' Controllers Package
 package "controllers" #E3F2FD {
     class SheetController {

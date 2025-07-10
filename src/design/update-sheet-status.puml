@@ -10,7 +10,7 @@ skinparam sequence {
     ParticipantBackgroundColor #BBDEFB
 }
 
-title Sequence 3: Update Sheet Status with Error Handling
+title Update Sheet Status with Error Handling
 
 actor Professor
 participant "Express\nServer" as Express

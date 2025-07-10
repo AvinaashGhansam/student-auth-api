@@ -10,7 +10,7 @@ skinparam sequence {
     ParticipantBackgroundColor #BBDEFB
 }
 
-title Sequence 1: Professor Creates Attendance Sheet
+title Professor Creates Attendance Sheet
 
 actor Professor
 participant "Express\nServer" as Express

@@ -144,6 +144,38 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
 
+  /logs:
+    get:
+      summary: Retrieve all logs
+      tags:
+        - Logs
+      responses:
+        '200':
+          description: A list of logs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Log'
+    post:
+      summary: Create a new log entry
+      tags:
+        - Logs
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Log'
+      responses:
+        '201':
+          description: Log created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Log'
+
 components:
   schemas:
     Sheet:
@@ -236,3 +268,16 @@ components:
           type: string
       required:
         - error
+
+    Log:
+      type: object
+      properties:
+        _id:
+          type: string
+        message:
+          type: string
+        level:
+          type: string
+        timestamp:
+          type: string
+          format: date-time

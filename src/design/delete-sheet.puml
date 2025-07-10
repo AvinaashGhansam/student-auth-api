@@ -10,7 +10,7 @@ skinparam sequence {
     ParticipantBackgroundColor #BBDEFB
 }
 
-title Sequence 6: Delete Attendance Sheet
+title Delete Attendance Sheet
 
 actor Professor
 participant "Express\nServer" as Express
