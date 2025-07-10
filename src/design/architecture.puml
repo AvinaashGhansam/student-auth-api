@@ -1,0 +1,201 @@
+@startuml Student_Auth_API_Architecture
+!theme plain
+skinparam componentStyle rectangle
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam backgroundColor #F5F5F5
+skinparam component {
+    BackgroundColor #E8F4FD
+    BorderColor #1976D2
+    FontColor #0D47A1
+}
+skinparam database {
+    BackgroundColor #FFF3E0
+    BorderColor #F57C00
+}
+skinparam cloud {
+    BackgroundColor #F3E5F5
+    BorderColor #7B1FA2
+}
+skinparam package {
+    BackgroundColor #FFFFFF
+    BorderColor #424242
+}
+
+title Student Auth API - Detailed Architecture Diagram
+
+' External Layer
+cloud "External Clients" as clients {
+    actor "API Consumer" as consumer
+    actor "Swagger UI User" as swagger_user
+}
+
+' API Gateway Layer
+package "API Gateway Layer" <<Rectangle>> {
+    component "Express Server\n:3000" as express
+    component "CORS Middleware" as cors
+    component "Body Parser\n(express.json)" as parser
+    component "Swagger UI\n/api/v1/docs" as swagger
+}
+
+' Routing Layer
+package "Routing Layer (/api/v1)" <<Rectangle>> {
+    component "Sheet Router\n/sheets" as sheet_router
+    component "Log Router\n/logs" as log_router
+    component "Async Handler\nWrapper" as async_handler
+}
+
+' Controller Layer
+package "Controller Layer" <<Rectangle>> {
+    component "SheetController" as sheet_ctrl {
+        rectangle "getSheets()" as getSheets
+        rectangle "getSheetById()" as getSheetById
+        rectangle "createSheet()" as createSheet
+        rectangle "updateSheet()" as updateSheet
+        rectangle "deleteSheet()" as deleteSheet
+    }
+
+    component "LogController" as log_ctrl {
+        rectangle "getLogs()" as getLogs
+        rectangle "createLog()" as createLog
+    }
+}
+
+' Service Layer
+package "Service Layer" <<Rectangle>> {
+    component "SheetService" as sheet_svc {
+        rectangle "Business Logic\nfor Sheets" as sheet_logic
+    }
+
+    component "LogService" as log_svc {
+        rectangle "Business Logic\nfor Logs" as log_logic
+    }
+}
+
+' Model Layer
+package "Model Layer (Mongoose)" <<Rectangle>> {
+    component "Sheet Model" as sheet_model {
+        rectangle "ISheet Interface" as isheet
+        rectangle "Schema Definition" as sheet_schema
+    }
+
+    component "Log Model" as log_model {
+        rectangle "ILog Interface" as ilog
+        rectangle "Schema Definition" as log_schema
+    }
+}
+
+' Data Layer
+database "MongoDB" as mongodb {
+    collections "sheets collection" as sheets_col
+    collections "logs collection" as logs_col
+}
+
+' Infrastructure Layer
+package "Infrastructure Layer" <<Rectangle>> {
+    component "Error Handler\nMiddleware" as error_handler
+    component "ApiError\nClass" as api_error
+    component "Winston Logger" as logger
+    component "Config Manager" as config {
+        rectangle "Environment\nValidation" as env_valid
+        rectangle "Config Class" as config_class
+    }
+}
+
+' OpenAPI Documentation
+note right of swagger
+    OpenAPI 3.0.0
+    Spec: openapi.yaml
+    - GET /sheets
+    - POST /sheets
+    - PUT /sheets/{id}
+    - Schema definitions
+end note
+
+' Sheet Model Details
+note left of sheet_model
+    Fields:
+    - className: string
+    - dateCreated: string
+    - secretKey?: string
+    - isActive: boolean
+    - location: {lat, lng}
+    - maxRadius?: string
+    - createdBy?: string
+    - reportId?: string
+end note
+
+' Log Model Details
+note right of log_model
+    Fields:
+    - sheetId: string
+    - id: string
+    - name?: string
+    - studentId?: string
+    - signedInAt?: string
+    - className?: string
+    - location?: {lat, lng}
+    - locationDenied?: boolean
+    - fingerprint?: string
+end note
+
+' Connections - Request Flow
+clients --> express : HTTP Requests
+swagger_user --> swagger : API Documentation
+express --> cors : Middleware Chain
+cors --> parser
+parser --> sheet_router : /api/v1/sheets
+parser --> log_router : /api/v1/logs
+swagger --> express : Serve UI
+
+' Router to Controller
+sheet_router --> async_handler : Route Handling
+log_router --> async_handler : Route Handling
+async_handler --> sheet_ctrl : Wrapped Calls
+async_handler --> log_ctrl : Wrapped Calls
+
+' Controller to Service
+sheet_ctrl --> sheet_svc : Service Methods
+log_ctrl --> log_svc : Service Methods
+
+' Service to Model
+sheet_svc --> sheet_model : Mongoose Operations
+log_svc --> log_model : Mongoose Operations
+
+' Model to Database
+sheet_model --> mongodb : CRUD Operations
+log_model --> mongodb : CRUD Operations
+mongodb --> sheets_col : Store Sheets
+mongodb --> logs_col : Store Logs
+
+' Error Handling Flow
+sheet_ctrl ..> error_handler : Error Propagation
+log_ctrl ..> error_handler : Error Propagation
+error_handler ..> api_error : Error Creation
+error_handler ..> logger : Error Logging
+
+' Configuration Flow
+express ..> config : Load Config
+sheet_svc ..> config : Use Config
+log_svc ..> config : Use Config
+
+' Docker Configuration
+note bottom of mongodb
+    Docker Compose:
+    - MongoDB 6.0
+    - Port: 27017
+    - Volume: mongo-data
+    - Health checks enabled
+end note
+
+' Environment Configuration
+note bottom of config
+    Environment Variables:
+    - PORT (validated)
+    - DB_URI (required)
+    - API_PREFIX: /api
+    - API_VERSION: v1
+    - MONGODB_URI
+end note
+
+@enduml

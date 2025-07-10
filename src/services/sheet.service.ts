@@ -5,8 +5,8 @@ export class SheetService {
     return SheetModel.create(data);
   }
 
-  getSheets() {
-    return SheetModel.find().lean().exec();
+  getSheets(filters: any = {}) {
+    return SheetModel.find(filters).lean().exec();
   }
 
   getSheetById(id: string) {
@@ -19,5 +19,13 @@ export class SheetService {
 
   deleteSheet(id: string) {
     return SheetModel.findByIdAndDelete(id).exec();
+  }
+
+  deleteSheetByReportId(reportId: string) {
+    return SheetModel.findOneAndDelete({ reportId }).exec();
+  }
+
+  getSheetByReportId(reportId: string) {
+    return SheetModel.findOne({ reportId }).lean().exec();
   }
 }

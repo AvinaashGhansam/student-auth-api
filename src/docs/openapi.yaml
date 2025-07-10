@@ -91,6 +91,58 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+    delete:
+      summary: Delete an attendance sheet by ID
+      tags:
+        - Sheets
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the sheet to delete
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Sheet deleted successfully
+        "404":
+          description: Sheet not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /sheets/{professorId}/{sheetId}:
+    get:
+      summary: Get a sheet by professorId and sheetId
+      tags:
+        - Sheets
+      parameters:
+        - name: professorId
+          in: path
+          required: true
+          description: The professor's ID (createdBy)
+          schema:
+            type: string
+        - name: sheetId
+          in: path
+          required: true
+          description: The sheet's MongoDB _id
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Sheet found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Sheet"
+        "404":
+          description: Sheet not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
 
 components:
   schemas:

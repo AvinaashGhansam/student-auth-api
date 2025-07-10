@@ -11,6 +11,10 @@ router
   .post(asyncHandler(ctrl.createSheet.bind(ctrl)));
 
 router
+  .route("/:professorId/:sheetId")
+  .get(asyncHandler(ctrl.getSheetById.bind(ctrl)));
+
+router
   .route("/:_id")
   .get(asyncHandler(ctrl.getSheetById.bind(ctrl)))
   .put(asyncHandler(ctrl.updateSheet.bind(ctrl)))
