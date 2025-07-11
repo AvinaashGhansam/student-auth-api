@@ -1,5 +1,8 @@
 import mongoose, { Schema, Document } from "mongoose";
 
+/**
+ * Database Schema for an attendance sheet
+ */
 export interface ISheet extends Document {
   className: string;
   dateCreated: string;

@@ -1,5 +1,8 @@
 import mongoose, { Schema, Document } from "mongoose";
 
+/**
+ * Database Schema for Logging
+ */
 export interface ILog extends Document {
   sheetId: string;
   id: string;

@@ -7,33 +7,49 @@ import YAML from "yamljs";
 
 import sheetsRouter from "./routes/api/v1/sheet.route";
 import logsRouter from "./routes/api/v1/log.route";
+import { Config } from "./config/config";
+import { errorHandler } from "./middleware/ErrorHandler";
+import { logger } from "./utils/logger";
 
 dotenv.config();
+
+const config = new Config();
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-// serve flat endpoints
-app.use("/api/v1/sheets", sheetsRouter);
-app.use("/api/v1/logs", logsRouter);
+app.use(`${config.apiPrefix}/${config.apiVersion}/sheets`, sheetsRouter);
+app.use(`${config.apiPrefix}/${config.apiVersion}/logs`, logsRouter);
 
 const swaggerDocument = YAML.load("./src/docs/openapi.yaml");
-app.use("/api/v1/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+app.use(
+  `${config.apiPrefix}/${config.apiVersion}/docs`,
+  swaggerUi.serve,
+  swaggerUi.setup(swaggerDocument),
+);
 
-const PORT = process.env.PORT || 4000;
+// Register error handler middleware as the last middleware
+app.use(errorHandler.handle);
+
 mongoose
-  .connect(process.env.MONGODB_URI!)
+  .connect(config.dbUri!)
   .then(() => {
-    app.listen(PORT, () => {
-      console.log("\n==============================");
-      console.log(`🚀 Server running on port ${PORT}`);
-      console.log("\nAvailable routes:");
-      console.log(`  • Sheets: http://localhost:${PORT}/api/v1/sheets`);
-      console.log(`  • Logs:   http://localhost:${PORT}/api/v1/logs`);
-      console.log("\nSwagger docs:");
-      console.log(`  • http://localhost:${PORT}/api/v1/docs`);
-      console.log("==============================\n");
+    app.listen(config.port, () => {
+      logger.info("==============================");
+      logger.info(`Server running on port ${config.port}`);
+      logger.info("Available routes:");
+      logger.info(
+        `Sheets: http://localhost:${config.port}${config.apiPrefix}/${config.apiVersion}/sheets`,
+      );
+      logger.info(
+        `Logs:   http://localhost:${config.port}${config.apiPrefix}/${config.apiVersion}/logs`,
+      );
+      logger.info("Swagger docs:");
+      logger.info(
+        `http://localhost:${config.port}${config.apiPrefix}/${config.apiVersion}/docs`,
+      );
+      logger.info("==============================");
     });
   })
-  .catch((err) => console.error("MongoDB connection error:", err));
+  .catch((err) => logger.error("MongoDB connection error:", err));

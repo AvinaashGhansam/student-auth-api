@@ -1,18 +1,25 @@
 import dotenv from "dotenv";
 dotenv.config();
 
-// Validate and parse PORT
+/**
+ * the port specify in the environment
+ */
 const portEnv = process.env.PORT ? parseInt(process.env.PORT, 10) : NaN;
 if (isNaN(portEnv) || portEnv <= 0) {
   throw new Error(`Invalid PORT value: ${process.env.PORT}`);
 }
 
-// Validate DB URI
-const dbUriEnv = process.env.DB_URI;
+/**
+ * Database URI validation
+ */
+const dbUriEnv = process.env.MONGODB_URI;
 if (!dbUriEnv) {
   throw new Error("DB_URI must be defined");
 }
 
+/**
+ * A config class to load all environment variables
+ */
 export class Config {
   public readonly apiPrefix: string;
   public readonly apiVersion: string;
@@ -26,5 +33,3 @@ export class Config {
     this.dbUri = dbUriEnv;
   }
 }
-
-export const config = new Config();

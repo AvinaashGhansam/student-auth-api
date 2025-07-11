@@ -2,6 +2,9 @@ import { Router } from "express";
 import asyncHandler from "express-async-handler";
 import { SheetController } from "../../../controllers/sheet.controller";
 
+/**
+ * Route for an attendance sheet
+ */
 const router = Router();
 const ctrl = new SheetController();
 
